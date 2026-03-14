@@ -1,65 +1,126 @@
-import Image from "next/image";
+"use client";
+
+import Link from "next/link";
+import { useState } from "react";
+import { CodeInput } from "@/components/code-input";
+import { Card } from "@/components/ui/card";
+import {
+  CodeCell,
+  LangCell,
+  RankCell,
+  ScoreCell,
+  TableRow,
+} from "@/components/ui/table-row";
 
 export default function Home() {
+  const [code, setCode] = useState("");
+  const [roastMode, setRoastMode] = useState(false);
+
+  const leaderboardData = [
+    {
+      rank: 1,
+      code: "function sum(a, b) { return a + b; }",
+      lang: "javascript",
+      score: 9.8,
+    },
+    {
+      rank: 2,
+      code: "const x = () => { console.log('x'); }",
+      lang: "javascript",
+      score: 8.2,
+    },
+    {
+      rank: 3,
+      code: "if (true) { return false; }",
+      lang: "javascript",
+      score: 7.5,
+    },
+  ];
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <div className="flex flex-col gap-8 py-20">
+      {/* Hero Section */}
+      <section className="flex flex-col items-center gap-4 text-center">
+        <h1 className="flex items-center gap-3 font-mono text-4xl font-bold text-foreground">
+          <span className="text-accent-green">&gt;</span>
+          paste your code. get roasted.
+        </h1>
+        <p className="font-mono text-sm text-muted-foreground">
+          {
+            "// drop your code below and we&apos;ll rate it — brutally honest or full roast mode"
+          }
+        </p>
+      </section>
+
+      {/* Code Input Area */}
+      <CodeInput
+        value={code}
+        onChange={setCode}
+        roastMode={roastMode}
+        onRoastModeChange={setRoastMode}
+      />
+
+      {/* Footer Stats */}
+      <section className="flex items-center justify-center gap-6">
+        <span className="font-mono text-xs text-muted-foreground">
+          2,847 codes roasted
+        </span>
+        <span className="text-muted-foreground">·</span>
+        <span className="font-mono text-xs text-muted-foreground">
+          avg score: 4.2/10
+        </span>
+      </section>
+
+      {/* Spacer */}
+      <div className="h-16" />
+
+      {/* Leaderboard Preview */}
+      <section className="flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <h2 className="font-mono text-lg font-semibold text-foreground">
+            leaderboard
+          </h2>
+          <Link
+            href="/leaderboard"
+            className="font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            view all &gt;&gt;
+          </Link>
         </div>
-      </main>
+        <p className="font-mono text-xs text-muted-foreground">
+          {"// the worst code on the internet, ranked by shame"}
+        </p>
+
+        <Card>
+          {leaderboardData.map((item, index) => (
+            <TableRow
+              key={item.rank}
+              variant={
+                index < leaderboardData.length - 1 ? "default" : undefined
+              }
+            >
+              <RankCell>#{item.rank}</RankCell>
+              <CodeCell>{item.code}</CodeCell>
+              <LangCell>{item.lang}</LangCell>
+              <ScoreCell score={item.score} />
+            </TableRow>
+          ))}
+        </Card>
+
+        <p className="text-center font-mono text-xs text-muted-foreground pt-4">
+          showing top 3 of 2,847 ·{" "}
+          <Link
+            href="/leaderboard"
+            className="hover:text-foreground transition-colors"
+          >
+            view full leaderboard
+          </Link>{" "}
+          &gt;&gt;
+        </p>
+      </section>
+
+      {/* Bottom Spacer */}
+      <div className="h-16" />
     </div>
   );
 }
