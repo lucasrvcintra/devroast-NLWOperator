@@ -15,6 +15,8 @@ import { useShikiHighlighter } from "@/hooks/use-shiki-highlighter";
 import { LANGUAGE_LIST, LANGUAGES, type LanguageId } from "@/lib/languages";
 import { cn } from "@/lib/utils";
 
+const CODE_CHAR_LIMIT = 2000;
+
 interface CodeEditorProps
   extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "onChange"> {
   value: string;
@@ -54,6 +56,9 @@ export function CodeEditor({
   >(language);
   const [isAutoDetect, setIsAutoDetect] = useState(true);
   const [hasHighlight, setHasHighlight] = useState(false);
+
+  const characterCount = value.length;
+  const exceedsLimit = characterCount > CODE_CHAR_LIMIT;
 
   const { highlight, isReady } = useShikiHighlighter();
   const { detectedLanguage: autoDetectedLanguage } = useLanguageDetection(
@@ -266,6 +271,19 @@ export function CodeEditor({
               )}
               {...props}
             />
+
+            {/* Character Count Indicator */}
+            <div
+              className={cn(
+                "absolute bottom-2 right-3 font-mono text-[10px] px-2 py-1 rounded bg-card/80 border border-border z-20",
+                exceedsLimit
+                  ? "text-red-500 border-red-500"
+                  : "text-muted-foreground",
+              )}
+            >
+              {characterCount.toLocaleString()} /{" "}
+              {CODE_CHAR_LIMIT.toLocaleString()}
+            </div>
           </div>
         </div>
       </div>
@@ -296,7 +314,7 @@ export function CodeEditor({
           <Button
             variant="default"
             size="sm"
-            disabled={!value}
+            disabled={!value || exceedsLimit}
             className="font-mono text-sm"
           >
             <span>$</span>

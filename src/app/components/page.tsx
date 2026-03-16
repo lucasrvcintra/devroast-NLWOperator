@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
-import { CodeBlock } from "@/components/ui/codeblock/codeblock";
+import { CodeBlock, CodeBlockHeader } from "@/components/ui/codeblock";
 import { DiffLine } from "@/components/ui/diff-line";
 import { ScoreRing } from "@/components/ui/score-ring";
 import {
@@ -67,7 +67,12 @@ const sections = [
   },
   {
     title: "// code_block",
-    component: <CodeBlock code={sampleCode} filename="calculate.js" />,
+    component: (
+      <div className="border border-border rounded-md overflow-hidden">
+        <CodeBlockHeader filename="calculate.js" />
+        <CodeBlock code={sampleCode} lang="javascript" />
+      </div>
+    ),
   },
   {
     title: "// diff_line",
