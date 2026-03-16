@@ -1,8 +1,7 @@
-"use client";
-
 import Link from "next/link";
-import { useState } from "react";
-import { CodeEditor } from "@/components/code-editor";
+import { Suspense } from "react";
+import { CodeEditorWrapper } from "@/components/code-editor-wrapper";
+import { FooterStats } from "@/components/footer-stats";
 import { Card } from "@/components/ui/card";
 import {
   CodeCell,
@@ -11,13 +10,67 @@ import {
   ScoreCell,
   TableRow,
 } from "@/components/ui/table-row";
-import type { LanguageId } from "@/lib/languages";
+import { HydrateClient, prefetch, trpc } from "@/trpc/server";
 
-export default function Home() {
-  const [code, setCode] = useState("");
-  const [roastMode, setRoastMode] = useState(false);
-  const [language, setLanguage] = useState<LanguageId | undefined>(undefined);
+export default async function Home() {
+  void prefetch(trpc.roast.getStats.queryOptions());
 
+  return (
+    <HydrateClient>
+      <div className="flex flex-col gap-8 py-20">
+        {/* Hero Section */}
+        <section className="flex flex-col items-center gap-4 text-center">
+          <h1 className="flex items-center gap-3 font-mono text-4xl font-bold text-foreground">
+            <span className="text-accent-green">&gt;</span>
+            paste your code. get roasted.
+          </h1>
+          <p className="font-mono text-sm text-muted-foreground">
+            {
+              "// drop your code below and we&apos;ll rate it — brutally honest or full roast mode"
+            }
+          </p>
+        </section>
+
+        {/* Code Input Area */}
+        <CodeEditorWrapper />
+
+        {/* Footer Stats */}
+        <Suspense fallback={<FooterStatsSkeleton />}>
+          <FooterStats />
+        </Suspense>
+
+        {/* Spacer */}
+        <div className="h-16" />
+
+        {/* Leaderboard Preview */}
+        <LeaderboardPreview />
+      </div>
+    </HydrateClient>
+  );
+}
+
+function FooterStatsSkeleton() {
+  return (
+    <section className="flex items-center justify-center gap-6">
+      <span className="font-mono text-xs text-muted-foreground">
+        <span className="inline-block w-16 animate-pulse rounded bg-muted">
+          &nbsp;
+        </span>{" "}
+        codes roasted
+      </span>
+      <span className="text-muted-foreground">·</span>
+      <span className="font-mono text-xs text-muted-foreground">
+        avg score:{" "}
+        <span className="inline-block w-8 animate-pulse rounded bg-muted">
+          &nbsp;
+        </span>
+        /10
+      </span>
+    </section>
+  );
+}
+
+function LeaderboardPreview() {
   const leaderboardData = [
     {
       rank: 1,
@@ -40,91 +93,43 @@ export default function Home() {
   ];
 
   return (
-    <div className="flex flex-col gap-8 py-20">
-      {/* Hero Section */}
-      <section className="flex flex-col items-center gap-4 text-center">
-        <h1 className="flex items-center gap-3 font-mono text-4xl font-bold text-foreground">
-          <span className="text-accent-green">&gt;</span>
-          paste your code. get roasted.
-        </h1>
-        <p className="font-mono text-sm text-muted-foreground">
-          {
-            "// drop your code below and we&apos;ll rate it — brutally honest or full roast mode"
-          }
-        </p>
-      </section>
+    <section className="flex flex-col gap-4">
+      <div className="flex items-center justify-between">
+        <h2 className="font-mono text-lg font-semibold text-foreground">
+          leaderboard
+        </h2>
+        <Link
+          href="/leaderboard"
+          className="font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
+        >
+          view all &gt;&gt;
+        </Link>
+      </div>
+      <p className="font-mono text-xs text-muted-foreground">
+        {"// the worst code on the internet, ranked by shame"}
+      </p>
 
-      {/* Code Input Area */}
-      <CodeEditor
-        value={code}
-        onChange={setCode}
-        language={language}
-        onLanguageChange={setLanguage}
-        roastMode={roastMode}
-        onRoastModeChange={setRoastMode}
-      />
+      <Card>
+        {leaderboardData.map((item) => (
+          <TableRow key={item.rank}>
+            <RankCell>#{item.rank}</RankCell>
+            <CodeCell>{item.code}</CodeCell>
+            <LangCell>{item.lang}</LangCell>
+            <ScoreCell score={item.score} />
+          </TableRow>
+        ))}
+      </Card>
 
-      {/* Footer Stats */}
-      <section className="flex items-center justify-center gap-6">
-        <span className="font-mono text-xs text-muted-foreground">
-          2,847 codes roasted
-        </span>
-        <span className="text-muted-foreground">·</span>
-        <span className="font-mono text-xs text-muted-foreground">
-          avg score: 4.2/10
-        </span>
-      </section>
-
-      {/* Spacer */}
-      <div className="h-16" />
-
-      {/* Leaderboard Preview */}
-      <section className="flex flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <h2 className="font-mono text-lg font-semibold text-foreground">
-            leaderboard
-          </h2>
-          <Link
-            href="/leaderboard"
-            className="font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
-          >
-            view all &gt;&gt;
-          </Link>
-        </div>
-        <p className="font-mono text-xs text-muted-foreground">
-          {"// the worst code on the internet, ranked by shame"}
-        </p>
-
-        <Card>
-          {leaderboardData.map((item, index) => (
-            <TableRow
-              key={item.rank}
-              variant={
-                index < leaderboardData.length - 1 ? "default" : undefined
-              }
-            >
-              <RankCell>#{item.rank}</RankCell>
-              <CodeCell>{item.code}</CodeCell>
-              <LangCell>{item.lang}</LangCell>
-              <ScoreCell score={item.score} />
-            </TableRow>
-          ))}
-        </Card>
-
-        <p className="text-center font-mono text-xs text-muted-foreground pt-4">
-          showing top 3 of 2,847 ·{" "}
-          <Link
-            href="/leaderboard"
-            className="hover:text-foreground transition-colors"
-          >
-            view full leaderboard
-          </Link>{" "}
-          &gt;&gt;
-        </p>
-      </section>
-
-      {/* Bottom Spacer */}
-      <div className="h-16" />
-    </div>
+      <p className="text-center font-mono text-xs text-muted-foreground pt-4">
+        showing top 3 of 2,847 ·{" "}
+        <Link
+          href="/leaderboard"
+          className="hover:text-foreground transition-colors"
+        >
+          view full leaderboard
+        </Link>{" "}
+        &gt;&gt;
+      </p>
+    </section>
   );
 }

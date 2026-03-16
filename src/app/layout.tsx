@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Navbar } from "@/components/navbar";
+import { TRPCReactProvider } from "@/trpc/client";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -29,8 +30,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen`}
       >
-        <Navbar />
-        <main className="mx-auto max-w-6xl px-10">{children}</main>
+        <TRPCReactProvider>
+          <Navbar />
+          <main className="mx-auto max-w-6xl px-10">{children}</main>
+        </TRPCReactProvider>
       </body>
     </html>
   );
