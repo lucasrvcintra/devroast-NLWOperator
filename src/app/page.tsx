@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { CodeInput } from "@/components/code-input";
+import { CodeEditor } from "@/components/code-editor";
 import { Card } from "@/components/ui/card";
 import {
   CodeCell,
@@ -11,10 +11,12 @@ import {
   ScoreCell,
   TableRow,
 } from "@/components/ui/table-row";
+import type { LanguageId } from "@/lib/languages";
 
 export default function Home() {
   const [code, setCode] = useState("");
   const [roastMode, setRoastMode] = useState(false);
+  const [language, setLanguage] = useState<LanguageId | undefined>(undefined);
 
   const leaderboardData = [
     {
@@ -53,9 +55,11 @@ export default function Home() {
       </section>
 
       {/* Code Input Area */}
-      <CodeInput
+      <CodeEditor
         value={code}
         onChange={setCode}
+        language={language}
+        onLanguageChange={setLanguage}
         roastMode={roastMode}
         onRoastModeChange={setRoastMode}
       />
