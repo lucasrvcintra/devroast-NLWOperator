@@ -1,6 +1,12 @@
+"use client";
+
+import { MoonIcon, SunIcon } from "lucide-react";
 import Link from "next/link";
+import { useTheme } from "@/components/ui/theme-provider";
 
 export function Navbar() {
+  const { theme, toggleTheme } = useTheme();
+
   return (
     <header className="w-full border-b border-border bg-background">
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-10">
@@ -20,6 +26,18 @@ export function Navbar() {
           >
             leaderboard
           </Link>
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="p-2 rounded-md hover:bg-bg-input transition-colors"
+            aria-label="Toggle theme"
+          >
+            {theme === "dark" ? (
+              <SunIcon className="w-4 h-4 text-muted-foreground" />
+            ) : (
+              <MoonIcon className="w-4 h-4 text-muted-foreground" />
+            )}
+          </button>
         </nav>
       </div>
     </header>

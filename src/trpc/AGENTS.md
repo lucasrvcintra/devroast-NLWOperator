@@ -78,3 +78,19 @@ export function Stats() {
 2. Prefetch no server com `void prefetch()` (sem await para streaming)
 3. Converter tipos não-serializáveis antes de retornar
 4. Expor `db` via contexto para queries diretas
+5. Usar `Promise.all` para queries independentes em Server Components
+
+## Queries Paralelas
+
+Quando precisar buscar múltiplos dados independentes, usar `Promise.all` com o `caller`:
+
+```tsx
+async function PageWithMultipleData() {
+  const [stats, leaderboard] = await Promise.all([
+    caller.roast.getStats(),
+    caller.roast.getLeaderboard({ limit: 3 }),
+  ]);
+  
+  return <Page stats={stats} leaderboard={leaderboard} />;
+}
+```

@@ -1,7 +1,7 @@
 import { forwardRef, type HTMLAttributes } from "react";
 import type { BundledLanguage } from "shiki";
 import { tv, type VariantProps } from "tailwind-variants";
-import { CodeBlock } from "@/components/ui/codeblock";
+import { CollapsibleCodeBlock } from "@/components/ui/collapsible-code-block";
 
 const entryVariants = tv({
   base: "w-full overflow-hidden rounded-md border border-border bg-card",
@@ -54,7 +54,10 @@ export const LeaderboardEntry = forwardRef<
         </div>
       </div>
       <div className="bg-bg-input p-4">
-        <CodeBlock code={codeString} lang={language as BundledLanguage} />
+        <CollapsibleCodeBlock
+          code={codeString}
+          lang={language as BundledLanguage}
+        />
       </div>
     </div>
   );

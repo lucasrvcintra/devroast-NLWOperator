@@ -1,19 +1,12 @@
-import Link from "next/link";
 import { Suspense } from "react";
 import { CodeEditorWrapper } from "@/components/code-editor-wrapper";
 import { FooterStats } from "@/components/footer-stats";
-import { Card } from "@/components/ui/card";
-import {
-  CodeCell,
-  LangCell,
-  RankCell,
-  ScoreCell,
-  TableRow,
-} from "@/components/ui/table-row";
+import { LeaderboardPreview } from "@/components/leaderboard-preview";
 import { HydrateClient, prefetch, trpc } from "@/trpc/server";
 
 export default async function Home() {
   void prefetch(trpc.roast.getStats.queryOptions());
+  void prefetch(trpc.roast.getLeaderboard.queryOptions());
 
   return (
     <HydrateClient>
@@ -43,7 +36,9 @@ export default async function Home() {
         <div className="h-16" />
 
         {/* Leaderboard Preview */}
-        <LeaderboardPreview />
+        <Suspense fallback={<LeaderboardSkeleton />}>
+          <LeaderboardPreview />
+        </Suspense>
       </div>
     </HydrateClient>
   );
@@ -70,65 +65,33 @@ function FooterStatsSkeleton() {
   );
 }
 
-function LeaderboardPreview() {
-  const leaderboardData = [
-    {
-      rank: 1,
-      code: "function sum(a, b) { return a + b; }",
-      lang: "javascript",
-      score: 9.8,
-    },
-    {
-      rank: 2,
-      code: "const x = () => { console.log('x'); }",
-      lang: "javascript",
-      score: 8.2,
-    },
-    {
-      rank: 3,
-      code: "if (true) { return false; }",
-      lang: "javascript",
-      score: 7.5,
-    },
-  ];
-
+function LeaderboardSkeleton() {
   return (
     <section className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
-        <h2 className="font-mono text-lg font-semibold text-foreground">
-          leaderboard
-        </h2>
-        <Link
-          href="/leaderboard"
-          className="font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
-        >
-          view all &gt;&gt;
-        </Link>
+        <div className="h-6 w-24 animate-pulse rounded bg-muted" />
+        <div className="h-4 w-16 animate-pulse rounded bg-muted" />
       </div>
-      <p className="font-mono text-xs text-muted-foreground">
-        {"// the worst code on the internet, ranked by shame"}
-      </p>
+      <div className="h-4 w-72 animate-pulse rounded bg-muted" />
 
-      <Card>
-        {leaderboardData.map((item) => (
-          <TableRow key={item.rank}>
-            <RankCell>#{item.rank}</RankCell>
-            <CodeCell>{item.code}</CodeCell>
-            <LangCell>{item.lang}</LangCell>
-            <ScoreCell score={item.score} />
-          </TableRow>
+      <div className="flex flex-col border border-border">
+        {[1, 2, 3].map((i) => (
+          <div
+            key={i}
+            className="flex items-center gap-4 border-b border-border px-5 py-4"
+          >
+            <div className="h-4 w-8 animate-pulse rounded bg-muted" />
+            <div className="h-4 flex-1 animate-pulse rounded bg-muted" />
+            <div className="h-4 w-20 animate-pulse rounded bg-muted" />
+            <div className="h-4 w-12 animate-pulse rounded bg-muted" />
+          </div>
         ))}
-      </Card>
+      </div>
 
       <p className="text-center font-mono text-xs text-muted-foreground pt-4">
-        showing top 3 of 2,847 ·{" "}
-        <Link
-          href="/leaderboard"
-          className="hover:text-foreground transition-colors"
-        >
-          view full leaderboard
-        </Link>{" "}
-        &gt;&gt;
+        <span className="inline-block w-20 animate-pulse rounded bg-muted">
+          &nbsp;
+        </span>
       </p>
     </section>
   );
