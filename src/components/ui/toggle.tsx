@@ -1,7 +1,7 @@
 "use client";
 
 import { Switch } from "@base-ui/react";
-import { forwardRef, type InputHTMLAttributes, useState } from "react";
+import { forwardRef, type InputHTMLAttributes, useId, useState } from "react";
 import { tv, type VariantProps } from "tailwind-variants";
 import { cn } from "@/lib/utils";
 
@@ -36,12 +36,14 @@ const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
       label,
       checked: controlledChecked,
       defaultChecked,
-      id,
+      id: idProp,
       onCheckedChange,
       ...props
     },
     ref,
   ) => {
+    const id = useId();
+    const generatedId = idProp ?? id;
     const isControlled = controlledChecked !== undefined;
     const [internalChecked, setInternalChecked] = useState(
       defaultChecked ?? false,
@@ -57,12 +59,16 @@ const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
     };
 
     return (
-      <div className={toggleVariants({ size, className })}>
+      <div
+        className={toggleVariants({ size, className })}
+        suppressHydrationWarning
+      >
         <Switch.Root
           ref={ref}
           checked={isChecked}
           onCheckedChange={handleOnCheckedChange}
-          id={id}
+          id={generatedId}
+          suppressHydrationWarning
           className={cn(
             "switch-root peer inline-flex shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
             isChecked ? "bg-accent-green" : "bg-border",
@@ -79,7 +85,8 @@ const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
         </Switch.Root>
         {label && (
           <label
-            htmlFor={id}
+            htmlFor={generatedId}
+            suppressHydrationWarning
             className={cn(
               "switch-label cursor-pointer font-mono transition-colors",
               isChecked ? "text-accent-green" : "text-foreground",

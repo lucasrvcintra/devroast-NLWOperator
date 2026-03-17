@@ -21,15 +21,18 @@ export function CodeBlockClient({
   const lines = code.split("\n");
 
   useEffect(() => {
+    const effectiveTheme = theme ?? "dark";
     codeToHtml(code, {
       lang,
-      theme: theme === "dark" ? "vesper" : "github-light",
+      theme: effectiveTheme === "dark" ? "vesper" : "github-light",
     }).then(setHtml);
   }, [code, lang, theme]);
 
   if (!html) {
-    return <div className="h-20 bg-bg-input animate-pulse" />;
+    return <div className="h-20 bg-bg-input animate-pulse rounded-md" />;
   }
+
+  const effectiveTheme = theme ?? "dark";
 
   return (
     <div
@@ -41,13 +44,13 @@ export function CodeBlockClient({
       <div
         className={twMerge(
           "flex",
-          theme === "dark" ? "bg-[#1a1a1a]" : "bg-gray-50",
+          effectiveTheme === "dark" ? "bg-[#1a1a1a]" : "bg-gray-50",
         )}
       >
         <div
           className={twMerge(
             "flex flex-col items-end gap-1.5 py-3 px-2.5 w-10 border-r border-border-primary select-none shrink-0",
-            theme === "dark" ? "bg-[#0a0a0a]" : "bg-gray-100",
+            effectiveTheme === "dark" ? "bg-[#0a0a0a]" : "bg-gray-100",
           )}
         >
           {lines.map((_, i) => (
