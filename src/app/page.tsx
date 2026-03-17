@@ -4,6 +4,8 @@ import { FooterStats } from "@/components/footer-stats";
 import { LeaderboardPreview } from "@/components/leaderboard-preview";
 import { HydrateClient, prefetch, trpc } from "@/trpc/server";
 
+export const revalidate = 3600;
+
 export default async function Home() {
   void prefetch(trpc.roast.getStats.queryOptions());
   void prefetch(trpc.roast.getLeaderboard.queryOptions());

@@ -7,7 +7,7 @@ export const roastRouter = createTRPCRouter({
   getStats: baseProcedure.query(async ({ ctx }) => {
     const [stats] = await ctx.db
       .select({
-        totalRoasts: count(),
+        totalRoasts: count(roasts.id),
         avgScore: avg(roasts.score),
       })
       .from(roasts);
@@ -22,12 +22,12 @@ export const roastRouter = createTRPCRouter({
     .input(
       z
         .object({
-          limit: z.number().min(1).max(100).default(3),
+          limit: z.number().min(1).max(100).default(20),
         })
         .optional(),
     )
     .query(async ({ ctx, input }) => {
-      const limit = input?.limit ?? 3;
+      const limit = input?.limit ?? 20;
 
       const entries = await ctx.db
         .select({
@@ -35,6 +35,7 @@ export const roastRouter = createTRPCRouter({
           code: roasts.code,
           language: roasts.language,
           score: roasts.score,
+          lines: roasts.lineCount,
         })
         .from(roasts)
         .orderBy(asc(roasts.score))
