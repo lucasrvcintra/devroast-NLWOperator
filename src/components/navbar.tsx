@@ -9,7 +9,7 @@ export function Navbar() {
 
   return (
     <header className="w-full border-b border-border bg-background">
-      <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-10">
+      <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-10 gap-4">
         <Link href="/" className="flex items-center gap-2">
           <span className="text-accent-green font-mono text-xl font-bold">
             &gt;

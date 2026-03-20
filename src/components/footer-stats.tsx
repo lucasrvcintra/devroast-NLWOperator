@@ -12,11 +12,11 @@ export async function FooterStats() {
   const stats = await getStats();
 
   return (
-    <section className="flex items-center justify-center gap-6">
+    <section className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-6">
       <span className="font-mono text-xs text-muted-foreground">
         <AnimatedNumber value={stats.totalRoasts} /> codes roasted
       </span>
-      <span className="text-muted-foreground">·</span>
+      <span className="hidden sm:inline text-muted-foreground">·</span>
       <span className="font-mono text-xs text-muted-foreground">
         avg score:{" "}
         <AnimatedNumber

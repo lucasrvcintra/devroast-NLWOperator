@@ -1,6 +1,7 @@
 import { forwardRef, type HTMLAttributes } from "react";
 
 import { tv, type VariantProps } from "tailwind-variants";
+import { cn } from "@/lib/utils";
 
 const tableRowVariants = tv({
   base: "flex items-center border-b border-border py-4 px-5",
@@ -24,7 +25,10 @@ const TableRow = forwardRef<HTMLDivElement, TableRowProps>(
     return (
       <div
         ref={ref}
-        className={tableRowVariants({ variant, className })}
+        className={cn(
+          "overflow-x-auto",
+          tableRowVariants({ variant, className }),
+        )}
         {...props}
       />
     );

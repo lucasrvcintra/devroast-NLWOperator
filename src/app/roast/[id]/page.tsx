@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { createCaller, prefetch, trpc } from "@/trpc/server";
+import { prefetch, trpc } from "@/trpc/server";
 import { RoastResult } from "./roast-result";
 
 export async function generateMetadata({
@@ -8,29 +8,20 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const caller = await createCaller();
 
-  try {
-    const data = await caller.roast.getById({ id });
-
-    return {
-      title: `Roast Results | devroast`,
-      description: `"${data.roast.roastQuote}" - Score: ${data.roast.score}/10`,
-      openGraph: {
-        title: `devroast | Score: ${data.roast.score}/10`,
-        description: data.roast.roastQuote ?? undefined,
-        images: [`/api/og/${id}`],
-      },
-      twitter: {
-        card: "summary_large_image",
-        images: [`/api/og/${id}`],
-      },
-    };
-  } catch {
-    return {
-      title: "Roast Not Found | devroast",
-    };
-  }
+  return {
+    title: `Roast Results | devroast`,
+    description: "Check your code roast results",
+    openGraph: {
+      title: "devroast | Roast Results",
+      description: "Check your code roast results",
+      images: [`/api/og/${id}`],
+    },
+    twitter: {
+      card: "summary_large_image",
+      images: [`/api/og/${id}`],
+    },
+  };
 }
 
 export default async function RoastResultsPage({

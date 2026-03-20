@@ -293,8 +293,8 @@ export function CodeEditor({
       </div>
 
       {/* Actions Bar */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
+      <div className="flex sm:flex-row flex-col-reverse items-center justify-between gap-4">
+        <div className="flex sm:flex-row flex-col sm:items-center items-start gap-4 w-full">
           <Toggle
             label="roast mode"
             checked={roastMode}
@@ -304,7 +304,7 @@ export function CodeEditor({
             {"// maximum sarcasm enabled"}
           </span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-row items-center justify-end gap-2 w-full">
           <Button
             variant="ghost"
             size="sm"
