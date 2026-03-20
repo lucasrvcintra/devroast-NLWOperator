@@ -47,12 +47,12 @@ export interface ErrorDisplayProps extends ComponentProps<"div"> {
 
 function ErrorDisplayRoot({
   code,
-  title = "Algo deu errado",
+  title = "Something went wrong",
   description,
   variant = "error",
   size = "full",
   showRedirect = true,
-  redirectLabel = "← Voltar para home",
+  redirectLabel = "← Back to home",
   className,
   ...props
 }: ErrorDisplayProps) {
