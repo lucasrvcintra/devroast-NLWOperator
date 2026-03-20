@@ -1,14 +1,15 @@
-"use client";
-
-import { useSuspenseQuery } from "@tanstack/react-query";
 import { LeaderboardEntry } from "@/components/leaderboard-entry";
-import { useTRPC } from "@/trpc/client";
+import { caller } from "@/trpc/server";
 
-export function LeaderboardList() {
-  const trpc = useTRPC();
-  const { data: entries } = useSuspenseQuery(
-    trpc.roast.getLeaderboard.queryOptions({ limit: 20 }),
-  );
+export const revalidate = 3600;
+
+async function getLeaderboardEntries() {
+  "use cache";
+  return caller.roast.getLeaderboard({ limit: 20 });
+}
+
+export async function LeaderboardList() {
+  const entries = await getLeaderboardEntries();
 
   return (
     <div className="flex flex-col gap-5">

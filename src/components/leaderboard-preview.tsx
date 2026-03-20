@@ -1,6 +1,3 @@
-"use client";
-
-import { useSuspenseQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import type { BundledLanguage } from "shiki";
 import { Card } from "@/components/ui/card";
@@ -12,24 +9,21 @@ import {
   TableCell,
   TableRow,
 } from "@/components/ui/table-row";
-import { useTRPC } from "@/trpc/client";
+import { caller } from "@/trpc/server";
 
-export function LeaderboardPreview() {
-  const trpc = useTRPC();
+export const revalidate = 3600;
 
-  const leaderboardQuery = useSuspenseQuery(
-    trpc.roast.getLeaderboard.queryOptions(),
-  );
-  const statsQuery = useSuspenseQuery(trpc.roast.getStats.queryOptions());
+async function getLeaderboardData() {
+  "use cache";
+  const [leaderboard, stats] = await Promise.all([
+    caller.roast.getLeaderboard({ limit: 3 }),
+    caller.roast.getStats(),
+  ]);
+  return { leaderboard, stats };
+}
 
-  const isLoading = leaderboardQuery.isLoading || statsQuery.isLoading;
-
-  if (isLoading) {
-    return <LeaderboardSkeleton />;
-  }
-
-  const data = leaderboardQuery.data;
-  const stats = statsQuery.data;
+export async function LeaderboardPreview() {
+  const { leaderboard: data, stats } = await getLeaderboardData();
 
   return (
     <section className="flex flex-col gap-4">

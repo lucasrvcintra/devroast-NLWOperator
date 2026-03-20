@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Suspense } from "react";
 import { Navbar } from "@/components/navbar";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { TRPCReactProvider } from "@/trpc/client";
@@ -20,6 +21,16 @@ export const metadata: Metadata = {
   description:
     "Drop your code below and we'll rate it — brutally honest or full roast mode",
 };
+
+function Loading() {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="animate-pulse font-mono text-muted-foreground">
+        loading...
+      </div>
+    </div>
+  );
+}
 
 export default function RootLayout({
   children,
@@ -54,7 +65,9 @@ export default function RootLayout({
         <TRPCReactProvider>
           <ThemeProvider>
             <Navbar />
-            <main className="mx-auto max-w-6xl px-10">{children}</main>
+            <main className="mx-auto max-w-6xl px-10">
+              <Suspense fallback={<Loading />}>{children}</Suspense>
+            </main>
           </ThemeProvider>
         </TRPCReactProvider>
       </body>
