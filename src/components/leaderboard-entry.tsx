@@ -27,33 +27,33 @@ export const LeaderboardEntry = forwardRef<
 
   return (
     <div ref={ref} className={entryVariants({ className })} {...props}>
-      <div className="flex h-12 items-center justify-between border-b border-border px-5">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1.5">
-            <span className="text-xs text-muted-foreground">#</span>
-            <span className="font-mono text-sm font-bold text-accent-amber">
+      <div className="flex h-12 items-center justify-between border-b border-border px-3 lg:px-5 overflow-x-auto">
+        <div className="flex items-center gap-3 lg:gap-4 min-w-0">
+          <div className="flex items-center gap-1">
+            <span className="text-xs text-muted-foreground shrink-0">#</span>
+            <span className="font-mono text-sm font-bold text-accent-amber shrink-0">
               {rank}
             </span>
           </div>
-          <div className="flex items-center gap-1.5">
-            <span className="font-mono text-xs text-muted-foreground">
+          <div className="flex items-center gap-1 min-w-0">
+            <span className="font-mono text-xs text-muted-foreground shrink-0">
               score:
             </span>
-            <span className="font-mono text-sm font-bold text-accent-red">
+            <span className="font-mono text-sm font-bold text-accent-red shrink-0">
               {score}
             </span>
           </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 lg:gap-3 shrink-0">
           <span className="font-mono text-xs text-muted-foreground">
             {language}
           </span>
-          <span className="font-mono text-xs text-muted-foreground">
+          <span className="font-mono text-xs text-muted-foreground hidden sm:inline">
             {lines} lines
           </span>
         </div>
       </div>
-      <div className="bg-bg-input p-4">
+      <div className="bg-bg-input p-2 lg:p-4 overflow-x-auto">
         <CollapsibleCodeBlock
           code={codeString}
           lang={language as BundledLanguage}
