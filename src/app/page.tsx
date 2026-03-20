@@ -16,7 +16,7 @@ export default async function Home() {
         </h1>
         <p className="font-mono text-sm text-muted-foreground">
           {
-            "// drop your code below and we&apos;ll rate it — brutally honest or full roast mode"
+            "// drop your code below and we'll rate it — brutally honest or full roast mode"
           }
         </p>
       </section>

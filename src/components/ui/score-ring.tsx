@@ -3,7 +3,7 @@ import { tv, type VariantProps } from "tailwind-variants";
 import { cn } from "@/lib/utils";
 
 const scoreRingVariants = tv({
-  base: "relative inline-flex items-center justify-center",
+  base: "relative inline-flex shrink-0 items-center justify-center",
   variants: {
     size: {
       sm: "h-[120px] w-[120px]",

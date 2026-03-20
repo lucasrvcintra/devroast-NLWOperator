@@ -1,24 +1,48 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { callGemini } from "./gemini";
+import { callOpenAI } from "./openai";
 
-const apiKey = process.env.GEMINI_API_KEY;
-if (!apiKey) {
-  throw new Error("GEMINI_API_KEY environment variable is not set");
-}
+export async function generateContent(
+  prompt: string,
+  roastMode: boolean,
+): Promise<string> {
+  const errors: string[] = [];
 
-const genAI = new GoogleGenerativeAI(apiKey);
+  // Try Gemini first
+  if (process.env.GEMINI_API_KEY) {
+    try {
+      return await callGemini(prompt, roastMode);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
 
-const model = genAI.getGenerativeModel({
-  model: "gemini-2.0-flash",
-});
+      // Auth errors - don't fallback, key is invalid
+      if (
+        message.includes("401") ||
+        message.includes("403") ||
+        message.includes("API_KEY_INVALID")
+      ) {
+        throw error;
+      }
 
-export async function generateContent(prompt: string, roastMode: boolean) {
-  const result = await model.generateContent({
-    contents: [{ role: "user", parts: [{ text: prompt }] }],
-    generationConfig: {
-      temperature: roastMode ? 1.0 : 0.3,
-      maxOutputTokens: 2048,
-      responseMimeType: "text/plain",
-    },
-  });
-  return result.response.text();
+      errors.push(`Gemini: ${message}`);
+    }
+  }
+
+  // Try OpenAI
+  if (process.env.OPENAI_API_KEY) {
+    try {
+      return await callOpenAI(prompt, roastMode);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+
+      // Auth errors - don't fallback
+      if (message.includes("401") || message.includes("403")) {
+        throw error;
+      }
+
+      errors.push(`OpenAI: ${message}`);
+    }
+  }
+
+  // No providers available or all failed
+  throw new Error(`All AI providers failed: ${errors.join("; ")}`);
 }
