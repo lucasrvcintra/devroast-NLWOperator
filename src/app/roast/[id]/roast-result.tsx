@@ -1,9 +1,10 @@
 "use client";
 
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { CodeBlockClient } from "@/components/code-block-client";
 import { CodeBlockHeader } from "@/components/ui/codeblock";
 import { DiffLine } from "@/components/ui/diff-line";
+import { ErrorDisplayRoot } from "@/components/ui/error-display";
 import { ScoreRing } from "@/components/ui/score-ring";
 import { useTRPC } from "@/trpc/client";
 
@@ -13,7 +14,25 @@ interface RoastResultProps {
 
 export function RoastResult({ id }: RoastResultProps) {
   const trpc = useTRPC();
-  const { data } = useSuspenseQuery(trpc.roast.getById.queryOptions({ id }));
+  const { data, isError, error } = useQuery(
+    trpc.roast.getById.queryOptions({ id }),
+  );
+
+  if (isError) {
+    return (
+      <ErrorDisplayRoot
+        code={404}
+        title="Roast não encontrado"
+        description={error.message || "Este roast não existe ou foi removido."}
+        variant="error"
+        size="full"
+      />
+    );
+  }
+
+  if (!data) {
+    return null;
+  }
 
   const { roast, analysisItems } = data;
 

@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
-import { RoastResultSkeleton } from "@/components/roast-result-skeleton";
 import { createCaller, prefetch, trpc } from "@/trpc/server";
 import { RoastResult } from "./roast-result";
 
@@ -44,9 +42,5 @@ export default async function RoastResultsPage({
 
   void prefetch(trpc.roast.getById.queryOptions({ id }));
 
-  return (
-    <Suspense fallback={<RoastResultSkeleton />}>
-      <RoastResult id={id} />
-    </Suspense>
-  );
+  return <RoastResult id={id} />;
 }
