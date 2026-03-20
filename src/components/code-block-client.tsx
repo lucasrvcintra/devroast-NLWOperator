@@ -7,7 +7,7 @@ import { useTheme } from "@/components/ui/theme-provider";
 
 export interface CodeBlockClientProps {
   code: string;
-  lang: BundledLanguage;
+  lang: string;
   className?: string;
 }
 
