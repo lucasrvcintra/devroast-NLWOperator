@@ -79,13 +79,6 @@ Usar `gpt-4o-mini` (custo-benefício, rápido)
 src/lib/ai/
 ├── client.ts      # MOD - main entry point with fallback
 ├── gemini.ts      # EXTRACT - Gemini provider (from client.ts)
-├── openai.ts     # NEW - OpenAI provider implementation
-├── prompts.ts     # existing
-└── analyzer.ts    # existing
-```
-src/lib/ai/
-├── client.ts      # MOD - main entry point with fallback
-├── gemini.ts      # NEW - Gemini provider implementation
 ├── openai.ts      # NEW - OpenAI provider implementation
 ├── prompts.ts     # existing
 └── analyzer.ts   # existing
@@ -95,7 +88,7 @@ src/lib/ai/
 
 ## To-do de Implementação
 
-- [ ] Criar `src/lib/ai/gemini.ts` — extrair lógica do Gemini
+- [ ] Extrair lógica do Gemini para `src/lib/ai/gemini.ts`
 - [ ] Criar `src/lib/ai/openai.ts` — implementar OpenAI provider
 - [ ] Modificar `src/lib/ai/client.ts` — adicionar fallback logic
 - [ ] Testar fluxo completo
