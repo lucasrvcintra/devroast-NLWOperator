@@ -56,18 +56,56 @@ interface RoastAnalysis {
     title: string;
     description: string;
   }>;
-  suggestedFix: string;    // Código melhorado
+  suggestedFix: Array<{    // Diff lines para o componente DiffLine
+    type: "context" | "removed" | "added";
+    content: string;
+  }>;
 }
 ```
 
-### 6. Error Handling
+### 6. Language Detection
+
+- Usar `useLanguageDetection` hook existente (baseado em highlight.js)
+- Language detectado é enviado junto com o código na mutation
+- Display no results page: `lang: <language>`
+
+### 7. tRPC Procedures
+
+Usar queries existentes de `src/db/queries.ts`:
+
+```typescript
+// getById - usar getRoastWithAnalysis existente
+export const roastRouter = createTRPCRouter({
+  getById: baseProcedure
+    .input(z.object({ id: z.string().uuid() }))
+    .query(async ({ ctx, input }) => {
+      return getRoastWithAnalysis(input.id);
+    }),
+
+  create: baseProcedure
+    .input(z.object({
+      code: z.string().min(1).max(2000),
+      language: z.string(),
+      roastMode: z.boolean(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      // 1. Chamar Gemini API
+      // 2. Salvar roast + analysis items
+      // 3. Retornar { id }
+    }),
+});
+```
+
+### 8. Error Handling
 
 | Scenario | Behavior |
 |---|---|
 | AI API error | Show error toast, stay on editor |
-| Invalid AI response | Fallback to generic analysis, log error |
+| Invalid AI response | Throw error, show toast |
 | Empty code | Disable submit button |
 | Code exceeds limit | Show warning, disable submit |
+| Rate limit hit | Retry with exponential backoff (max 3 attempts) |
+| Request timeout | Fail after 30s, show error |
 
 ---
 
@@ -94,10 +132,11 @@ src/
 
 ## To-do de Implementação
 
+- [ ] Instalar `@google/generative-ai`
 - [ ] Criar `src/lib/ai/client.ts` — Gemini client setup
-- [ ] Criar `src/lib/ai/prompts.ts` — System prompts
+- [ ] Criar `src/lib/ai/prompts.ts` — System prompts (normal + roast mode)
 - [ ] Criar `src/lib/ai/analyzer.ts` — Response parsing + Zod schema
-- [ ] Modificar `src/trpc/routers/roast.ts` — Adicionar mutation `create`
+- [ ] Modificar `src/trpc/routers/roast.ts` — Adicionar mutation `create` + query `getById`
 - [ ] Criar `src/components/roast-result-skeleton.tsx` — Loading skeleton
 - [ ] Modificar `src/components/code-editor-wrapper.tsx` — Add mutation + redirect
 - [ ] Modificar `src/app/roast/[id]/page.tsx` — Fetch real data via tRPC
