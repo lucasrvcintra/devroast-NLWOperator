@@ -1,11 +1,6 @@
 import { asc, eq, sql } from "drizzle-orm";
 import { db } from "./index";
-import {
-  analysisItems,
-  type NewAnalysisItem,
-  type NewRoast,
-  roasts,
-} from "./schema";
+import { analysisItems, roasts } from "./schema";
 
 export async function createRoast(data: {
   code: string;

@@ -39,7 +39,6 @@ async function CodeBlock({ code, lang, className }: CodeBlockProps) {
         {/* Code */}
         <div
           className="flex-1 p-3 overflow-x-auto font-mono text-[13px] leading-tight [&_pre]:!bg-transparent [&_pre]:!m-0 [&_pre]:!p-0 [&_code]:!bg-transparent [&_.line]:leading-[1.65]"
-          // biome-ignore lint/security/noDangerouslySetInnerHtml: shiki generates trusted HTML from code strings server-side
           dangerouslySetInnerHTML={{ __html: html }}
         />
       </div>
@@ -68,6 +67,6 @@ function CodeBlockHeader({ filename }: CodeBlockHeaderProps) {
 export {
   CodeBlock,
   CodeBlockHeader,
-  type CodeBlockProps,
   type CodeBlockHeaderProps,
+  type CodeBlockProps,
 };

@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronDown, ChevronUp } from "lucide-react";
-import { type ComponentProps, type HTMLAttributes, useState } from "react";
+import { type HTMLAttributes, useState } from "react";
 import type { BundledLanguage } from "shiki";
 import { twMerge } from "tailwind-merge";
 import { tv, type VariantProps } from "tailwind-variants";

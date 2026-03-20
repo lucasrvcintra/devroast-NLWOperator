@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { type BundledLanguage, codeToHtml } from "shiki";
+import { codeToHtml } from "shiki";
 import { twMerge } from "tailwind-merge";
 import { useTheme } from "@/components/ui/theme-provider";
 

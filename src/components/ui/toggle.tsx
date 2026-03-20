@@ -38,7 +38,6 @@ const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
       defaultChecked,
       id: idProp,
       onCheckedChange,
-      ...props
     },
     ref,
   ) => {

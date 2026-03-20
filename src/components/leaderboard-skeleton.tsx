@@ -8,9 +8,10 @@ export function LeaderboardSkeleton() {
       <div className="h-4 w-72 animate-pulse rounded bg-muted" />
 
       <div className="flex flex-col border border-border">
-        {[...Array(20)].map((_, i) => (
+        {Array.from({ length: 20 }, (_, idx) => (
           <div
-            key={i}
+            // biome-ignore lint/suspicious/noArrayIndexKey: skeleton items are static and won't change
+            key={`skeleton-${idx}`}
             className="flex items-center gap-4 border-b border-border px-5 py-4"
           >
             <div className="h-4 w-8 animate-pulse rounded bg-muted" />
