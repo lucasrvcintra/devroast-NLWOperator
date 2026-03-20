@@ -28,6 +28,8 @@ interface CodeEditorProps
   autoDetect?: boolean;
   roastMode?: boolean;
   onRoastModeChange?: (checked: boolean) => void;
+  onSubmit?: () => void;
+  isSubmitting?: boolean;
 }
 
 export function CodeEditor({
@@ -40,6 +42,8 @@ export function CodeEditor({
   autoDetect = true,
   roastMode = false,
   onRoastModeChange,
+  onSubmit,
+  isSubmitting,
   className,
   placeholder = "// paste your code here...",
   ...props
@@ -314,11 +318,16 @@ export function CodeEditor({
           <Button
             variant="default"
             size="sm"
-            disabled={!value || exceedsLimit}
+            disabled={!value || exceedsLimit || isSubmitting}
+            onClick={onSubmit}
             className="font-mono text-sm"
           >
-            <span>$</span>
-            <span>roast_my_code</span>
+            {isSubmitting ? (
+              <span className="animate-spin">⟳</span>
+            ) : (
+              <span>$</span>
+            )}
+            <span>{isSubmitting ? "analyzing..." : "roast_my_code"}</span>
           </Button>
         </div>
       </div>
