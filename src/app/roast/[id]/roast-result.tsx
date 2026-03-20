@@ -1,7 +1,9 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { Share } from "lucide-react";
 import { CodeBlockClient } from "@/components/code-block-client";
+import { Button } from "@/components/ui/button";
 import { CodeBlockHeader } from "@/components/ui/codeblock";
 import { DiffLine } from "@/components/ui/diff-line";
 import { ErrorDisplayRoot } from "@/components/ui/error-display";
@@ -14,9 +16,7 @@ interface RoastResultProps {
 
 export function RoastResult({ id }: RoastResultProps) {
   const trpc = useTRPC();
-  const { data, isError, error } = useQuery(
-    trpc.roast.getById.queryOptions({ id }),
-  );
+  const { data, isError } = useQuery(trpc.roast.getById.queryOptions({ id }));
 
   if (isError) {
     return (
@@ -49,12 +49,17 @@ export function RoastResult({ id }: RoastResultProps) {
     good: "green",
   } as const;
 
+  const handleShare = () => {
+    const imageUrl = `${window.location.origin}/api/og/${id}`;
+    window.open(imageUrl, "_blank");
+  };
+
   return (
     <div className="mx-auto max-w-[1440px] px-4 lg:px-20 py-6 lg:py-10">
       {/* Header Section */}
       <div className="flex flex-col lg:flex-row justify-center items-center gap-6 lg:gap-12 mb-8 lg:mb-10">
         <ScoreRing score={roast.score} size="lg" />
-        <div className="flex flex-col gap-3 lg:gap-4 justify-center max-w-xl text-center lg:text-left">
+        <div className="flex flex-col gap-3 lg:gap-4 justify-center items-center max-w-xl text-center lg:text-left">
           <div className="flex items-center gap-2 justify-center lg:justify-start">
             <span className="w-2 h-2 rounded-full bg-accent-red shrink-0" />
             <span className="font-mono text-xs lg:text-sm font-medium text-accent-red">
@@ -64,7 +69,7 @@ export function RoastResult({ id }: RoastResultProps) {
           <h1 className="font-mono text-base lg:text-xl leading-relaxed text-foreground px-2 lg:px-0">
             &quot;{roast.roastQuote}&quot;
           </h1>
-          <div className="flex items-center gap-2 lg:gap-4 justify-center lg:justify-start text-xs">
+           <div className="flex items-center gap-2 lg:gap-4 justify-center lg:justify-start text-xs">
             <span className="font-mono text-muted-foreground">
               lang: {roast.language}
             </span>
@@ -72,8 +77,18 @@ export function RoastResult({ id }: RoastResultProps) {
             <span className="font-mono text-muted-foreground">
               {roast.lineCount} lines
             </span>
+           </div>
+            {/* Share Button */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleShare}
+              className="font-mono text-xs gap-2 border-border-primary text-text-secondary hover:text-text-primary w-fit"
+              >
+              <Share className="h-3 w-3" />
+              share_roast
+            </Button>
           </div>
-        </div>
       </div>
 
       <div className="h-px bg-border mb-6 lg:mb-10" />
