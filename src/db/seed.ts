@@ -13,7 +13,6 @@ const LANGUAGES = [
   "c",
   "cpp",
   "csharp",
-  "php",
   "ruby",
   "swift",
   "kotlin",
@@ -33,14 +32,13 @@ const SEVERITIES = ["critical", "warning", "good"] as const;
 const ROAST_QUOTES = [
   "Este código é tão ruim que até o compilador está chorando.",
   "Eu vi códigos melhores em scripts de SQL injection.",
-  " parabéns, você conseguiu escrever O(n^infinity) acidentalmente.",
+  "Parabéns, você conseguiu escrever O(n^infinity) acidentalmente.",
   "Este código tem mais bugs do que um filme de terror.",
   "A única coisa mais desorganizada que isso é a minha sala.",
   "Quem escreveu isso? O café estava quente demais?",
   "Isso não é código, é uma confissão de crimes.",
   "Tentei rodar isso e meu terminal pediu desculpas.",
   "Este código é a razão pela qual precisamos de revisões.",
-  "坊主(deixa), esse código precisa de exorcismo.",
 ];
 
 const ANALYSIS_TITLES = {
@@ -58,7 +56,7 @@ const ANALYSIS_TITLES = {
     "Código duplicado",
     "Nomenclatura inconsistente",
     "Comentários desatualizados",
-    "Não siguen o style guide",
+    "Não segue o style guide",
   ],
   good: [
     "Boa nomenclatura",
@@ -69,75 +67,298 @@ const ANALYSIS_TITLES = {
   ],
 };
 
-function generateCode(language: string): string {
-  const templates: Record<string, () => string> = {
-    javascript: () => {
-      const bad = faker.datatype.boolean();
-      if (bad) {
-        return `function ${faker.word.noun()}() {
-  var x = 1;
-  var y = 2;
-  if (true) { return x + y; }
+const BAD_CODES: Record<string, string[]> = {
+  javascript: [
+    `function calc() {
+  var x=1; var y=2; var z=3;
+  if(true){return x+y+z;}
   console.log(x);
-}`;
-      }
-      return `function calculateSum(a, b) {
-  return a + b;
-}`;
-    },
-    python: () => {
-      const bad = faker.datatype.boolean();
-      if (bad) {
-        return `def process():
-    x=1
-    y=2
+}`,
+    `const data = fetch('/api/users').then(r => r.json());
+data.then(d => console.log(d));`,
+    `function process(items) {
+  items.forEach(i => { i.processed = true; });
+  return items.filter(i => i.active);
+}`,
+  ],
+  typescript: [
+    `interface Data {
+  id: string;
+  value: any;
+}
+function getData(): any {
+  return null;
+}`,
+    `type Config = {
+  url: string,
+  method: string
+}
+const config: Config = { url: '', method: 'GET' };`,
+  ],
+  python: [
+    `def process():
+    x=1;y=2;z=3
     if True:
-     return x+y
-    print(x)`;
-      }
-      return `def calculate_sum(a, b):
-    return a + b`;
-    },
-    typescript: () => {
-      const bad = faker.datatype.boolean();
-      if (bad) {
-        return `interface User {
+     return x+y+z
+    print(x)`,
+    `def get_data():
+ return requests.get('url').json()`,
+  ],
+  rust: [
+    `fn main() {
+    let x = 1;
+    let y = 2;
+    println!("{}", x);
+}`,
+    `fn process(data: Vec<i32>) -> Vec<i32> {
+    let mut result = Vec::new();
+    for i in data {
+        result.push(i * 2);
+    }
+    return result;
+}`,
+  ],
+  go: [
+    `func process() {
+    x := 1
+    y := 2
+    fmt.Println(x)
+    return x + y
+}`,
+    `func getData() map[string]interface{} {
+    return nil
+}`,
+  ],
+  java: [
+    `public int calculate() {
+    int x=1; int y=2; int z=3;
+    if(true) { return x+y+z; }
+    System.out.println(x);
+}`,
+    `public Object getData() {
+    return null;
+}`,
+  ],
+  c: [
+    `int process() {
+    int x=1,y=2,z=3;
+    if(1) { return x+y+z; }
+    printf("%d\\n", x);
+}`,
+    `char* getData() {
+    return NULL;
+}`,
+  ],
+  cpp: [
+    `int process() {
+    int x=1; int y=2; int z=3;
+    if(true) { return x+y+z; }
+    cout << x << endl;
+}`,
+    `std::string getData() {
+    return NULL;
+}`,
+  ],
+  csharp: [
+    `public int Calculate() {
+    int x=1;int y=2;int z=3;
+    if(true) { return x+y+z; }
+    Console.WriteLine(x);
+}`,
+    `public object GetData() {
+    return null;
+}`,
+  ],
+  ruby: [
+    `def process
+    x=1;y=2;z=3
+    if true
+     return x+y+z
+    end
+    puts x
+    end`,
+    `def get_data
+    return nil
+    end`,
+  ],
+  swift: [
+    `func process() -> Int {
+    var x = 1
+    var y = 2
+    print(x)
+    return x + y
+}`,
+    `func getData() -> [String: Any] {
+    return nil
+}`,
+  ],
+  kotlin: [
+    `fun process(): Int {
+    val x = 1; val y = 2; val z = 3
+    if (true) { return x + y + z }
+    println(x)
+}`,
+    `fun getData(): Map<String, Any>? {
+    return null
+}`,
+  ],
+  sql: [
+    `SELECT * FROM users WHERE id = ` +
+      faker.string.alphanumeric(5) +
+      `;
+SELECT name, email FROM orders WHERE status = 'pending';
+SELECT u.name, o.total FROM users u, orders o WHERE u.id = o.user_id;`,
+    `select id,name,email,password from users where email='admin@example.com';`,
+    `SELECT * FROM products, categories, orders WHERE products.id = orders.product_id;`,
+  ],
+};
+
+const GOOD_CODES: Record<string, string[]> = {
+  javascript: [
+    `function calculateSum(a, b) {
+  return a + b;
+}`,
+    `const fetchUser = async (id) => {
+  const response = await fetch(\`/api/users/\${id}\`);
+  return response.json();
+};`,
+  ],
+  typescript: [
+    `interface User {
+  id: string;
   name: string;
   email: string;
 }
 
-function getUser(id: string) {
-  const user: any = null;
-  return user;
-}`;
-      }
-      return `interface User {
-  id: string;
-  name: string;
+async function getUser(id: string): Promise<User | null> {
+  const response = await fetch(\`/api/users/\${id}\`);
+  return response.json();
+}`,
+  ],
+  python: [
+    `def calculate_sum(a: int, b: int) -> int:
+    """Calculate the sum of two numbers."""
+    return a + b`,
+    `def get_user(user_id: int) -> dict | None:
+    """Fetch user data from API."""
+    response = requests.get(f"/api/users/{user_id}")
+    return response.json() if response.ok else None`,
+  ],
+  rust: [
+    `fn calculate_sum(a: i32, b: i32) -> i32 {
+    a + b
 }
 
-function getUser(id: string): User | null {
-  return { id, name: "John" };
-}`;
-    },
-    rust: () => {
-      const bad = faker.datatype.boolean();
-      if (bad) {
-        return `fn main() {
-    let x = 1;
-    let y = 2;
-    println!("{}", x);
-}`;
-      }
-      return `fn main() {
-    let sum = |a: i32, b: i32| a + b;
-    println!("{}", sum(1, 2));
-}`;
-    },
-  };
+fn main() {
+    let result = calculate_sum(1, 2);
+    println!("{}", result);
+}`,
+  ],
+  go: [
+    `func calculateSum(a, b int) int {
+    return a + b
+}`,
+    `func getUser(id string) (*User, error) {
+    resp, err := http.Get("/api/users/" + id)
+    if err != nil {
+        return nil, err
+    }
+    defer resp.Body.Close()
+    return decodeUser(resp.Body)
+}`,
+  ],
+  java: [
+    `public int calculateSum(int a, int b) {
+    return a + b;
+}`,
+    `public Optional<User> getUser(Long id) {
+    return Optional.ofNullable(userRepository.findById(id));
+}`,
+  ],
+  c: [
+    `int calculate_sum(int a, int b) {
+    return a + b;
+}`,
+    `char* get_greeting(const char* name) {
+    size_t len = strlen(name) + 6;
+    char* result = malloc(len);
+    snprintf(result, len, "Hello, %s!", name);
+    return result;
+}`,
+  ],
+  cpp: [
+    `int calculateSum(int a, int b) {
+    return a + b;
+}`,
+    `std::optional<User> getUser(int id) {
+    auto result = db.query("SELECT * FROM users WHERE id = ?", id);
+    return result.empty() ? std::nullopt : std::make_optional(result[0]);
+}`,
+  ],
+  csharp: [
+    `public int CalculateSum(int a, int b) => a + b;`,
+    `public async Task<User?> GetUserAsync(int id)
+    {
+        return await _context.Users.FindAsync(id);
+    }`,
+  ],
+  ruby: [
+    `def calculate_sum(a, b)
+    a + b
+    end`,
+    `def get_user(user_id)
+    User.find_by(id: user_id)
+    end`,
+  ],
+  swift: [
+    `func calculateSum(_ a: Int, _ b: Int) -> Int {
+    return a + b
+}`,
+    `func getUser(id: String) async throws -> User {
+    let (data, _) = try await URLSession.shared.data(from: url)
+    return try JSONDecoder().decode(User.self, from: data)
+}`,
+  ],
+  kotlin: [
+    `fun calculateSum(a: Int, b: Int): Int = a + b`,
+    `suspend fun getUser(id: String): User? {
+    return userService.getUserById(id)
+}`,
+  ],
+  sql: [
+    `SELECT 
+    u.id,
+    u.name,
+    u.email,
+    COUNT(o.id) AS order_count
+FROM users u
+LEFT JOIN orders o ON o.user_id = u.id
+WHERE u.status = 'active'
+GROUP BY u.id
+HAVING COUNT(o.id) > 0
+ORDER BY order_count DESC;`,
+    `SELECT 
+    p.id,
+    p.name AS product_name,
+    c.name AS category_name,
+    p.price
+FROM products p
+INNER JOIN categories c ON c.id = p.category_id
+WHERE p.is_active = true
+ORDER BY p.created_at DESC
+LIMIT 50;`,
+    `INSERT INTO audit_log (entity_type, entity_id, action, user_id, created_at)
+SELECT 'user', id, 'deleted', 1, NOW()
+FROM users
+WHERE status = 'inactive'
+AND last_login < NOW() - INTERVAL '1 year';`,
+  ],
+};
 
-  const generator = templates[language] || templates.javascript;
-  return generator();
+function generateCode(language: string, isGood: boolean): string {
+  const codes = isGood ? GOOD_CODES : BAD_CODES;
+  const options = codes[language] || codes.javascript;
+  return faker.helpers.arrayElement(options);
 }
 
 function getVerdict(score: number): (typeof VERDICTS)[number] {
@@ -155,12 +376,13 @@ async function seed() {
 
   for (let i = 0; i < roastCount; i++) {
     const language = faker.helpers.arrayElement(LANGUAGES);
+    const isGoodCode = faker.datatype.boolean();
     const score = parseFloat(
       faker.number.float({ min: 0, max: 10, fractionDigits: 1 }).toFixed(1),
     );
     const verdict = getVerdict(score);
     const roastMode = faker.datatype.boolean();
-    const code = generateCode(language);
+    const code = generateCode(language, isGoodCode);
     const lineCount = code.split("\n").length;
 
     const [roast] = await db
@@ -173,7 +395,8 @@ async function seed() {
         score,
         verdict,
         roastQuote: roastMode ? faker.helpers.arrayElement(ROAST_QUOTES) : null,
-        suggestedFix: roastMode ? generateCode(language) : null,
+        suggestedFix:
+          roastMode && !isGoodCode ? generateCode(language, true) : null,
       })
       .returning();
 
@@ -187,7 +410,9 @@ async function seed() {
     }[] = [];
 
     for (let j = 0; j < analysisItemCount; j++) {
-      const severity = faker.helpers.arrayElement(SEVERITIES);
+      const severity = isGoodCode
+        ? faker.helpers.arrayElement(["warning", "good"])
+        : faker.helpers.arrayElement(["critical", "warning"]);
       const titles = ANALYSIS_TITLES[severity];
 
       items.push({
