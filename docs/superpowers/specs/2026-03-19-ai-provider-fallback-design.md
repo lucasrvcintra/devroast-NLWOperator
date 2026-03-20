@@ -31,16 +31,27 @@ generateContent(prompt, roastMode)
     │
     ├─→ try Gemini (se GEMINI_API_KEY existe)
     │       │
-    │       └─→ sucesso: retorna response
+    │       ├─→ sucesso: retorna response
+    │       └─→ erro 429/5xx/network: guarda erro, tenta próximo
+    │                    erro 401/403: throw imediatamente (chave inválida)
     │
     └─→ catch → try OpenAI (se OPENAI_API_KEY existe)
                 │
-                └─→ sucesso: retorna response
-                        │
-                        └─→ catch → throw Error("All AI providers failed")
+                ├─→ sucesso: retorna response
+                └─→ catch → throw Error("All AI providers failed")
 ```
 
-### 4. Provider Interface
+### 4. Error Handling por Tipo
+
+| Error | Ação |
+|---|---|
+| 401/403 (auth) | Throw imediatamente - chave inválida não funcionará em nenhum provider |
+| 429 (rate limit) | Fallback para próximo provider |
+| 500/502/503 | Fallback para próximo provider |
+| Network/timeout | Fallback para próximo provider |
+| Unknown | Fallback após logging |
+
+### 5. Provider Interface
 
 ```typescript
 interface AIProvider {
@@ -51,10 +62,26 @@ interface AIProvider {
 
 Cada provider implementa sua própria lógica de chamada.
 
+### 6. Environment Validation
+
+- Verificar keys no momento da chamada (lazy), não no load do módulo
+- Se nenhuma key configurada: throw Error com mensagem descritiva
+
+### 7. OpenAI Model
+
+Usar `gpt-4o-mini` (custo-benefício, rápido)
+
 ---
 
 ## Estrutura de Arquivos
 
+```
+src/lib/ai/
+├── client.ts      # MOD - main entry point with fallback
+├── gemini.ts      # EXTRACT - Gemini provider (from client.ts)
+├── openai.ts     # NEW - OpenAI provider implementation
+├── prompts.ts     # existing
+└── analyzer.ts    # existing
 ```
 src/lib/ai/
 ├── client.ts      # MOD - main entry point with fallback
