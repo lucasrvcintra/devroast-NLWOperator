@@ -17,6 +17,11 @@ export const trpc = createTRPCOptionsProxy({
 
 export const caller = appRouter.createCaller(await createTRPCContext());
 
+export async function createCaller() {
+  const ctx = await createTRPCContext();
+  return appRouter.createCaller(ctx);
+}
+
 export function HydrateClient({ children }: { children: React.ReactNode }) {
   const queryClient = getQueryClient();
   return (
