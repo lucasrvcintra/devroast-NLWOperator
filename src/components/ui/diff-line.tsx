@@ -6,8 +6,8 @@ const diffLineVariants = tv({
   base: "flex w-full font-mono text-[13px] leading-[1.6] px-4 py-2",
   variants: {
     type: {
-      removed: "bg-[#1A0A0A] text-muted-foreground [&_span]:text-accent-red",
-      added: "bg-[#0A1A0F] text-foreground [&_span]:text-accent-green",
+      removed: "bg-diff-removed text-muted-foreground [&_span]:text-accent-red",
+      added: "bg-diff-added text-foreground [&_span]:text-accent-green",
       context: "text-muted-foreground [&_span]:text-muted-foreground/60",
     },
   },

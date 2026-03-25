@@ -22,6 +22,8 @@
   --color-white: var(--white);
   --color-blue: var(--blue);
   --color-gray: var(--gray);
+  --color-diff-removed: var(--diff-removed);
+  --color-diff-added: var(--diff-added);
   --font-mono: "JetBrains Mono", monospace;
   --radius-m: 16px;
 }
@@ -47,6 +49,8 @@
   --white: #ffffff;
   --blue: #3b82f6;
   --gray: #6b7280;
+  --diff-removed: #fee2e2;
+  --diff-added: #dcfce7;
 }
 
 :root.dark {
@@ -70,6 +74,8 @@
   --white: #0a0a0a;
   --blue: #60a5fa;
   --gray: #9ca3af;
+  --diff-removed: #1a0a0a;
+  --diff-added: #0a1a0f;
 }
 
 body {
