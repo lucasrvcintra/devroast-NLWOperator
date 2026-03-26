@@ -87,15 +87,27 @@ export const roastRouter = createTRPCRouter({
           const response = await generateContent(fullPrompt, input.roastMode);
           analysisResult = parseAnalysisResponse(response);
           break;
-        } catch {
+        } catch (error) {
           attempts++;
-          if (attempts >= maxAttempts) {
+          const isLastAttempt = attempts >= maxAttempts;
+          console.error(`AI attempt ${attempts} failed:`, error);
+
+          if (isLastAttempt) {
+            const errorMsg =
+              error instanceof Error ? error.message : "Unknown error";
+            const isQuotaError =
+              errorMsg.includes("429") || errorMsg.includes("quota");
+
             throw new TRPCError({
               code: "INTERNAL_SERVER_ERROR",
-              message: "Failed to generate analysis after retries",
+              message: isQuotaError
+                ? "AI service temporarily unavailable. Please try again in a few minutes."
+                : `Analysis failed: ${errorMsg}`,
             });
           }
-          await new Promise((resolve) => setTimeout(resolve, 1000 * attempts));
+
+          const delay = Math.min(1000 * 2 ** (attempts - 1), 5000);
+          await new Promise((resolve) => setTimeout(resolve, delay));
         }
       }
 

@@ -28,15 +28,24 @@ export const RoastAnalysisSchema = z.object({
 export type RoastAnalysis = z.infer<typeof RoastAnalysisSchema>;
 
 export function parseAnalysisResponse(text: string): RoastAnalysis {
-  const cleaned = text
-    .trim()
-    .replace(/```json\n?/g, "")
-    .replace(/```\n?$/g, "");
+  let cleaned = text.trim();
+
+  cleaned = cleaned.replace(/```json\n?/g, "").replace(/```\n?$/g, "");
+  cleaned = cleaned.replace(/^```\w*\n?/, "").replace(/\n?```$/, "");
+
+  console.log("Raw AI response:", cleaned);
 
   try {
     const parsed = JSON.parse(cleaned);
     return RoastAnalysisSchema.parse(parsed);
   } catch {
+    const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      try {
+        const parsed = JSON.parse(jsonMatch[0]);
+        return RoastAnalysisSchema.parse(parsed);
+      } catch {}
+    }
     throw new Error("Failed to parse AI response as valid JSON");
   }
 }
